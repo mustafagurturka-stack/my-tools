@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="My Library">
+<meta name="theme-color" content="#0f1117">
+<link rel="manifest" href="manifest.json">
+<title>My Library</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0f1117;--card:#181c27;--card2:#1e2235;--border:#262d42;
+  --text:#ffffff;--text2:#c8cfe0;--muted:#6b7694;--dim:#3a4260;
+  --orange:#ff8c42;--yellow:#f5c542;--blue:#4f8eff;--purple:#9b6dff;
+  --green:#2ecc8a;--red:#ff5470;--cyan:#29e0d0;--pink:#ff5fa0;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:15px;line-height:1.5;min-height:100vh;padding-bottom:90px;overflow-x:hidden}
+
+#bgCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.3}
+.wrap{position:relative;z-index:1}
+
+.topnav{position:sticky;top:0;z-index:100;background:rgba(15,17,23,.95);border-bottom:1px solid var(--border);padding:0 18px;height:56px;display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(12px)}
+.nav-logo{font-size:17px;font-weight:700;letter-spacing:-.3px}
+.nav-logo span{color:var(--orange)}
+.nav-right{display:flex;align-items:center;gap:10px}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:var(--dim);transition:all .3s}
+.sync-dot.ok{background:var(--green);box-shadow:0 0 8px var(--green)}
+.sync-dot.busy{background:var(--yellow);animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.add-nav{font-size:13px;font-weight:600;padding:6px 14px;border-radius:7px;border:none;background:var(--orange);color:#fff;cursor:pointer;transition:all .2s}
+.add-nav:hover{opacity:.85;transform:translateY(-1px)}
+
+/* MOTI */
+.moti-banner{margin:14px 16px 0;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;animation:slideDown .5s ease}
+@keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+.moti-emoji{font-size:24px;animation:bounce 2.5s ease infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.moti-text{flex:1;font-size:13px;color:var(--text2);line-height:1.4}
+.moti-text b{color:var(--text)}
+
+/* NEXT BOOK */
+.next-book{margin:12px 16px 0;background:linear-gradient(135deg,rgba(255,140,66,.12),rgba(245,197,66,.07));border:1px solid rgba(255,140,66,.25);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:14px;position:relative;overflow:hidden;animation:fadeIn .6s ease;cursor:pointer}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.nb-shine{position:absolute;top:-30px;right:-30px;width:100px;height:100px;background:radial-gradient(circle,rgba(255,140,66,.15),transparent 70%);border-radius:50%;animation:float 4s ease infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.nb-icon{font-size:28px}
+.nb-body{flex:1}
+.nb-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--orange);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px}
+.nb-title{font-size:15px;font-weight:700}
+.nb-author{font-size:12px;color:var(--muted)}
+.nb-arrow{font-size:18px;color:var(--orange)}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px 16px 0}
+.stat-box{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 8px;text-align:center;transition:transform .2s;cursor:default}
+.stat-box:hover{transform:translateY(-2px)}
+.stat-n{font-size:22px;font-weight:700;line-height:1;letter-spacing:-.5px}
+.stat-l{font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-top:3px;text-transform:uppercase;letter-spacing:.5px}
+.sn-orange{color:var(--orange)}.sn-blue{color:var(--blue)}.sn-green{color:var(--green)}.sn-yellow{color:var(--yellow)}
+
+/* SECTION */
+.section{margin:14px 16px 0}
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.sec-title{font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;font-family:'JetBrains Mono',monospace}
+.box{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.sec-btn{font-size:12px;font-weight:600;padding:6px 14px;border-radius:7px;border:none;background:var(--orange);color:#fff;cursor:pointer;transition:all .2s}
+.sec-btn:hover{opacity:.85}
+.sec-btn.ghost{background:transparent;border:1px solid var(--border);color:var(--text2)}
+.sec-btn.ghost:hover{border-color:var(--orange);color:var(--orange)}
+
+/* GOAL RING */
+.goal-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;display:flex;align-items:center;gap:18px}
+.goal-ring-wrap{position:relative;width:90px;height:90px;flex-shrink:0}
+.goal-ring-wrap svg{transform:rotate(-90deg)}
+.r-bg{fill:none;stroke:var(--border);stroke-width:8}
+.r-fill{fill:none;stroke-width:8;stroke-linecap:round;stroke:var(--orange);transition:stroke-dashoffset 1.2s cubic-bezier(.34,1.2,.64,1)}
+.goal-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.goal-pct{font-size:20px;font-weight:700;color:var(--orange);line-height:1}
+.goal-frac{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-top:2px}
+.goal-right{flex:1}
+.goal-year{font-size:16px;font-weight:700;margin-bottom:3px}
+.goal-sub{font-size:12px;color:var(--muted);margin-bottom:10px}
+.goal-edit-row{display:flex;align-items:center;gap:8px}
+.goal-edit-row input{width:60px;background:var(--card2);border:1px solid var(--border);color:var(--text);padding:6px 8px;font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:600;border-radius:7px;outline:none;text-align:center}
+.goal-edit-row input:focus{border-color:var(--orange)}
+.goal-edit-row span{font-size:12px;color:var(--muted)}
+.goal-set{font-size:11px;padding:6px 11px;border-radius:7px;background:rgba(255,140,66,.15);border:1px solid rgba(255,140,66,.3);color:var(--orange);cursor:pointer;font-weight:600}
+.goal-set:hover{background:rgba(255,140,66,.25)}
+
+/* MONTH CHART */
+.chart-inner{padding:14px}
+.month-bars{display:flex;align-items:flex-end;gap:4px;height:64px;margin-bottom:6px}
+.m-col{flex:1;display:flex;flex-direction:column;align-items:center}
+.m-bar{width:100%;border-radius:3px 3px 0 0;background:var(--border);min-height:3px;transition:height .8s cubic-bezier(.34,1.2,.64,1)}
+.m-bar.has{background:linear-gradient(180deg,var(--orange),rgba(255,140,66,.5))}
+.m-bar.cur{background:linear-gradient(180deg,var(--yellow),rgba(245,197,66,.5))}
+.m-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--dim);margin-top:5px;text-align:center}
+.m-lbl.cur{color:var(--yellow)}
+
+/* GENRE DONUT */
+.genre-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;align-items:center;gap:16px}
+.donut-wrap{position:relative;width:80px;height:80px;flex-shrink:0}
+.donut-wrap svg{transform:rotate(-90deg)}
+.genre-legend{flex:1;display:flex;flex-direction:column;gap:7px}
+.g-row{display:flex;align-items:center;gap:8px}
+.g-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.g-name{font-size:12px;color:var(--muted);flex:1}
+.g-cnt{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:var(--text2)}
+
+/* TABS */
+.tab-bar{display:flex;background:var(--card2);border-radius:9px;padding:3px;gap:3px;margin:14px 16px 0}
+.tab-btn{flex:1;font-size:12px;font-weight:600;padding:8px;border-radius:7px;border:none;background:transparent;color:var(--muted);cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif}
+.tab-btn.active{background:var(--card);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.tab-cnt{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-left:3px}
+
+/* FILTER */
+.filter-bar{display:flex;gap:8px;padding:12px 16px;flex-wrap:wrap}
+.filter-bar input{flex:1;min-width:140px;background:var(--card2);border:1px solid var(--border);color:var(--text);padding:9px 12px;font-size:14px;border-radius:8px;outline:none;transition:border-color .2s}
+.filter-bar input::placeholder{color:var(--dim)}
+.filter-bar input:focus{border-color:var(--orange)}
+.filter-bar select{background:var(--card2);border:1px solid var(--border);color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:10px;padding:9px 10px;border-radius:8px;outline:none}
+.filter-bar select option{background:var(--card)}
+
+/* BOOK GRID */
+.book-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:10px;padding:0 16px 16px}
+.book-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 13px;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s;animation:cardIn .35s ease}
+@keyframes cardIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.book-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.book-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:12px 12px 0 0}
+.gc-roman::after,.gc-fiction::after{background:linear-gradient(90deg,var(--orange),var(--yellow))}
+.gc-nonfiction::after{background:linear-gradient(90deg,var(--blue),var(--cyan))}
+.gc-biography::after{background:linear-gradient(90deg,var(--green),var(--cyan))}
+.gc-science::after{background:linear-gradient(90deg,var(--yellow),var(--orange))}
+.gc-history::after{background:linear-gradient(90deg,var(--purple),var(--pink))}
+.gc-selfhelp::after{background:linear-gradient(90deg,var(--cyan),var(--green))}
+.gc-philosophy::after{background:linear-gradient(90deg,var(--pink),var(--purple))}
+.gc-other::after{background:var(--border)}
+.book-num{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--dim);margin-bottom:7px}
+.book-title{font-size:14px;font-weight:700;line-height:1.25;margin-bottom:3px}
+.book-author{font-size:12px;color:var(--muted);margin-bottom:9px;font-style:italic}
+.genre-pill{font-family:'JetBrains Mono',monospace;font-size:9px;padding:3px 8px;border-radius:5px;background:rgba(255,140,66,.1);color:var(--orange);border:1px solid rgba(255,140,66,.2);display:inline-block;margin-bottom:7px}
+.pri-pill{font-family:'JetBrains Mono',monospace;font-size:9px;padding:3px 8px;border-radius:5px;background:rgba(245,197,66,.1);color:var(--yellow);border:1px solid rgba(245,197,66,.2);display:inline-block;margin-bottom:7px;margin-left:4px}
+.book-stars{font-size:13px;color:var(--yellow);margin-bottom:7px;letter-spacing:1px}
+.book-note{font-size:12px;color:var(--muted);font-style:italic;border-top:1px solid var(--border);padding-top:8px;margin-top:5px;line-height:1.45}
+.card-btns{display:flex;gap:5px;margin-top:10px;flex-wrap:wrap;align-items:center}
+.c-btn{font-family:'JetBrains Mono',monospace;font-size:10px;padding:5px 9px;border-radius:6px;border:1px solid var(--border);background:none;color:var(--muted);cursor:pointer;transition:all .2s}
+.c-btn:hover{border-color:var(--orange);color:var(--orange)}
+.c-done{background:rgba(46,204,138,.1);border-color:rgba(46,204,138,.3);color:var(--green)}
+.c-done:hover{background:rgba(46,204,138,.2)}
+.c-del:hover{border-color:rgba(255,84,112,.4);color:var(--red);background:rgba(255,84,112,.07)}
+.read-date{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--dim);margin-left:auto}
+.empty-state{text-align:center;padding:36px 20px;color:var(--muted);font-size:14px;grid-column:1/-1}
+
+/* NOTIF */
+.notif-section{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.notif-row{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--border)}
+.notif-row:last-child{border-bottom:none}
+.notif-icon{font-size:18px;width:30px;text-align:center}
+.notif-body{flex:1}
+.notif-title{font-size:13px;font-weight:600}
+.notif-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.notif-time input{background:var(--card2);border:1px solid var(--border);color:var(--text);padding:4px 8px;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:11px;outline:none;width:80px}
+.notif-time input:focus{border-color:var(--orange)}
+.toggle{position:relative;width:40px;height:22px;background:var(--border);border-radius:11px;cursor:pointer;transition:background .3s;flex-shrink:0;border:none}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;background:#fff;border-radius:50%;transition:transform .3s}
+.toggle.on{background:var(--orange)}
+.toggle.on::after{transform:translateX(18px)}
+.notif-perm-btn{width:100%;padding:11px;font-size:13px;font-weight:600;border:none;background:linear-gradient(90deg,var(--orange),var(--yellow));color:#000;cursor:pointer;transition:opacity .2s;font-family:'Inter',sans-serif}
+.notif-perm-btn:hover{opacity:.88}
+
+/* CONFETTI */
+.confetti-piece{position:fixed;width:8px;height:8px;border-radius:2px;pointer-events:none;z-index:999;animation:confettiFall 1.8s ease forwards}
+@keyframes confettiFall{0%{transform:translateY(-20px) rotate(0);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+
+/* PANEL */
+.panel{display:none}.panel.active{display:block}
+
+/* MODAL */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(8px);z-index:500;align-items:flex-end;justify-content:center}
+.overlay.open{display:flex}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:20px 20px 0 0;padding:20px 18px 44px;width:100%;max-width:540px;max-height:92vh;overflow-y:auto}
+.modal-bar{width:32px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 18px}
+.modal-title{font-size:18px;font-weight:700;margin-bottom:18px}
+.fg{margin-bottom:13px}
+.fg label{display:block;font-size:11px;font-weight:600;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.6px;font-family:'JetBrains Mono',monospace}
+.fg input,.fg select,.fg textarea{width:100%;background:var(--card2);border:1px solid var(--border);color:var(--text);padding:11px 13px;font-family:'Inter',sans-serif;font-size:14px;border-radius:9px;outline:none;transition:border-color .2s}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--orange)}
+.fg textarea{resize:vertical;min-height:70px}
+.fg select option{background:var(--card)}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.star-row{display:flex;gap:6px}
+.star-b{font-size:26px;cursor:pointer;color:var(--dim);background:none;border:none;padding:0;line-height:1;transition:color .15s,transform .15s}
+.star-b.on{color:var(--yellow)}
+.star-b:hover{transform:scale(1.2)}
+.mactions{display:flex;gap:8px;margin-top:18px}
+.btn-c{flex:1;background:var(--card2);border:1px solid var(--border);color:var(--muted);padding:12px;font-size:13px;font-weight:600;border-radius:10px;cursor:pointer;font-family:'Inter',sans-serif}
+.btn-s{flex:2;background:var(--orange);border:none;color:#fff;padding:12px;font-size:13px;font-weight:600;border-radius:10px;cursor:pointer;font-family:'Inter',sans-serif;transition:opacity .2s}
+.btn-s:hover{opacity:.88}
+
+/* BOTTOM NAV */
+.bnav{position:fixed;bottom:0;left:0;right:0;background:rgba(15,17,23,.97);border-top:1px solid var(--border);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom);backdrop-filter:blur(12px)}
+.bnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:9px 0;cursor:pointer;color:var(--dim);font-size:9px;font-family:'JetBrains Mono',monospace;letter-spacing:.5px;text-transform:uppercase;gap:3px;border:none;background:none;transition:color .2s}
+.bnav-btn.active{color:var(--orange)}
+.bnav-icon{font-size:19px;line-height:1}
+</style>
+</head>
+<body>
+<canvas id="bgCanvas"></canvas>
+<div class="wrap">
+
+<nav class="topnav">
+  <div class="nav-logo">My <span>Library</span></div>
+  <div class="nav-right">
+    <div class="sync-dot" id="syncDot"></div>
+    <button class="add-nav" onclick="openAdd()">+ Kitap</button>
+  </div>
+</nav>
+
+<!-- STATS PANEL -->
+<div class="panel active" id="pStats">
+  <div class="moti-banner">
+    <div class="moti-emoji" id="motiEmoji">📚</div>
+    <div class="moti-text" id="motiText">Bugün harika bir gün okumak için!</div>
+  </div>
+
+  <div id="nextBookWrap"></div>
+
+  <div class="stats-row">
+    <div class="stat-box"><div class="stat-n sn-orange" id="stRead">0</div><div class="stat-l">Okunan</div></div>
+    <div class="stat-box"><div class="stat-n sn-blue" id="stToRead">0</div><div class="stat-l">Okunacak</div></div>
+    <div class="stat-box"><div class="stat-n sn-green" id="stTotal">0</div><div class="stat-l">Toplam</div></div>
+    <div class="stat-box"><div class="stat-n sn-yellow" id="stAvg">—</div><div class="stat-l">Ort. Puan</div></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><div class="sec-title">Yıllık Hedef</div></div>
+    <div class="goal-card">
+      <div class="goal-ring-wrap">
+        <svg width="90" height="90" viewBox="0 0 90 90">
+          <circle class="r-bg" cx="45" cy="45" r="36"/>
+          <circle class="r-fill" id="goalFill" cx="45" cy="45" r="36" stroke-dasharray="226.19" stroke-dashoffset="226.19"/>
+        </svg>
+        <div class="goal-center">
+          <div class="goal-pct" id="goalPct">0%</div>
+          <div class="goal-frac" id="goalFrac">0/20</div>
+        </div>
+      </div>
+      <div class="goal-right">
+        <div class="goal-year" id="goalYear">2025 Hedefi</div>
+        <div class="goal-sub" id="goalSub">Bu yıl 20 kitap</div>
+        <div class="goal-edit-row">
+          <input type="number" id="goalInput" min="1" max="365" placeholder="20">
+          <span>kitap</span>
+          <button class="goal-set" onclick="setGoal()">Güncelle</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-head">
+      <div class="sec-title">Aylık Okuma</div>
+      <span id="yearLabel" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)"></span>
+    </div>
+    <div class="box"><div class="chart-inner">
+      <div class="month-bars" id="monthBars"></div>
+      <div style="display:flex;gap:4px" id="monthLabels"></div>
+    </div></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><div class="sec-title">Tür Dağılımı</div></div>
+    <div class="genre-card">
+      <div class="donut-wrap"><svg width="80" height="80" viewBox="0 0 80 80" id="donutSvg"></svg></div>
+      <div class="genre-legend" id="genreLegend"></div>
+    </div>
+  </div>
+</div>
+
+<!-- BOOKS PANEL -->
+<div class="panel" id="pBooks">
+  <div class="tab-bar">
+    <button class="tab-btn active" id="tbRead" onclick="switchBookTab('read')">Okunanlar <span class="tab-cnt" id="cntRead">0</span></button>
+    <button class="tab-btn" id="tbToRead" onclick="switchBookTab('toread')">Okunacaklar <span class="tab-cnt" id="cntToRead">0</span></button>
+  </div>
+  <div id="panelRead">
+    <div class="filter-bar">
+      <input type="text" placeholder="Kitap veya yazar..." oninput="renderBooks()" id="srRead">
+      <select onchange="renderBooks()" id="sortRead"><option value="date-desc">En Son</option><option value="rating">En Yüksek Puan</option><option value="title">A→Z</option></select>
+      <select onchange="renderBooks()" id="gnRead"><option value="">Tüm Türler</option></select>
+    </div>
+    <div class="book-grid" id="gridRead"></div>
+  </div>
+  <div id="panelToRead" style="display:none">
+    <div class="filter-bar">
+      <input type="text" placeholder="Kitap veya yazar..." oninput="renderBooks()" id="srToRead">
+      <select onchange="renderBooks()" id="sortToRead"><option value="added">Eklenme</option><option value="priority">Öncelik</option><option value="title">A→Z</option></select>
+      <select onchange="renderBooks()" id="gnToRead"><option value="">Tüm Türler</option></select>
+    </div>
+    <div class="book-grid" id="gridToRead"></div>
+  </div>
+</div>
+
+<!-- NOTIF PANEL -->
+<div class="panel" id="pNotif">
+  <div class="section" style="padding-top:16px">
+    <div class="sec-head"><div class="sec-title">Bildirimler</div></div>
+    <div class="notif-section">
+      <button class="notif-perm-btn" id="permBtn" onclick="requestPermission()">🔔 Bildirimlere İzin Ver</button>
+      <div class="notif-row">
+        <div class="notif-icon">📖</div>
+        <div class="notif-body"><div class="notif-title">Okuma Hatırlatıcısı</div><div class="notif-sub">Her gün okumayı hatırlatır</div></div>
+        <div class="notif-time"><input type="time" id="dailyTime" value="21:00" onchange="saveNotifSettings()"></div>
+        <button class="toggle" id="tog-daily" onclick="toggleNotif('daily')"></button>
+      </div>
+      <div class="notif-row">
+        <div class="notif-icon">📊</div>
+        <div class="notif-body"><div class="notif-title">Haftalık Hedef İlerlemesi</div><div class="notif-sub">Pazartesi sabahı haftalık özet</div></div>
+        <button class="toggle" id="tog-weekly" onclick="toggleNotif('weekly')"></button>
+      </div>
+      <div class="notif-row">
+        <div class="notif-icon">📋</div>
+        <div class="notif-body"><div class="notif-title">Okunacaklar Hatırlatıcısı</div><div class="notif-sub">Listendeki kitapları hatırlatır</div></div>
+        <div class="notif-time"><input type="time" id="listTime" value="19:00" onchange="saveNotifSettings()"></div>
+        <button class="toggle" id="tog-list" onclick="toggleNotif('list')"></button>
+      </div>
+    </div>
+    <div style="margin-top:10px;padding:12px 16px;background:var(--card);border:1px solid var(--border);border-radius:10px">
+      <div style="font-size:12px;color:var(--muted);line-height:1.6"><b style="color:var(--text2)">Not:</b> Bildirimler tarayıcı izni gerektirir. iPhone'da "Ana Ekrana Ekle" ile PWA olarak kurman önerilir.</div>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bnav">
+  <button class="bnav-btn active" id="bn0" onclick="goPanel(0)"><span class="bnav-icon">📊</span>İstatistik</button>
+  <button class="bnav-btn" id="bn1" onclick="goPanel(1)"><span class="bnav-icon">📚</span>Kitaplar</button>
+  <button class="bnav-btn" id="bn2" onclick="goPanel(2)"><span class="bnav-icon">🔔</span>Bildirim</button>
+</nav>
+
+<!-- ADD MODAL -->
+<div class="overlay" id="addModal">
+  <div class="modal">
+    <div class="modal-bar"></div>
+    <div class="modal-title" id="modalTitle">Kitap Ekle</div>
+    <div class="fg"><label>Kitap Adı *</label><input type="text" id="fTitle" placeholder="ör. Suç ve Ceza"></div>
+    <div class="fg"><label>Yazar *</label><input type="text" id="fAuthor" placeholder="ör. Fyodor Dostoyevski"></div>
+    <div class="frow">
+      <div class="fg"><label>Tür</label>
+        <select id="fGenre">
+          <option value="roman">Roman</option><option value="fiction">Kurgu</option>
+          <option value="nonfiction">Non-Fiction</option><option value="biography">Biyografi</option>
+          <option value="science">Bilim</option><option value="history">Tarih</option>
+          <option value="selfhelp">Kişisel Gelişim</option><option value="philosophy">Felsefe</option>
+          <option value="other">Diğer</option>
+        </select>
+      </div>
+      <div class="fg"><label>Durum</label>
+        <select id="fStatus"><option value="read">Okudum</option><option value="toread">Okuyacağım</option></select>
+      </div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label>Okuma Tarihi</label><input type="month" id="fDate"></div>
+      <div class="fg"><label>Öncelik</label>
+        <select id="fPriority"><option value="normal">Normal</option><option value="high">Yüksek ★</option><option value="low">Düşük</option></select>
+      </div>
+    </div>
+    <div class="fg"><label>Puan</label>
+      <div class="star-row">
+        <button class="star-b" data-v="1" onclick="setStar(1)">★</button>
+        <button class="star-b" data-v="2" onclick="setStar(2)">★</button>
+        <button class="star-b" data-v="3" onclick="setStar(3)">★</button>
+        <button class="star-b" data-v="4" onclick="setStar(4)">★</button>
+        <button class="star-b" data-v="5" onclick="setStar(5)">★</button>
+      </div>
+    </div>
+    <div class="fg"><label>Not</label><textarea id="fNote" placeholder="Bu kitap hakkında..."></textarea></div>
+    <div class="mactions">
+      <button class="btn-c" onclick="closeAdd()">İptal</button>
+      <button class="btn-s" onclick="saveBook()">Kaydet</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+const FB={apiKey:"AIzaSyCN_UK0E2ZytmpuowWsa9c3eRcXrVETc1Y",authDomain:"my-tracker-app-c3ea3.firebaseapp.com",projectId:"my-tracker-app-c3ea3",storageBucket:"my-tracker-app-c3ea3.firebasestorage.app",messagingSenderId:"122209797481",appId:"1:122209797481:web:b295f766e38e120dbbe9f8"};
+const app=initializeApp(FB);
+const db=getFirestore(app);
+const REF=doc(db,"library","data");
+
+const GENRES={roman:'Roman',fiction:'Kurgu',nonfiction:'Non-Fiction',biography:'Biyografi',science:'Bilim',history:'Tarih',selfhelp:'Kişisel Gelişim',philosophy:'Felsefe',other:'Diğer'};
+const GCOLS=['#ff8c42','#4f8eff','#2ecc8a','#f5c542','#9b6dff','#ff5fa0','#29e0d0','#ff5470','#a0ff8c'];
+const MONTHS=['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'];
+const MOTIS=[
+  {e:'📚',t:'<b>Bugün bir sayfa bile okumak</b> fark yaratır.'},
+  {e:'🌟',t:'<b>Her kitap yeni bir dünya.</b> Keşfetmeye devam et!'},
+  {e:'🎯',t:'<b>Hedefine yaklaşıyorsun.</b> Okumayı sürdür!'},
+  {e:'💡',t:'<b>Okuyan insan düşünen insandır.</b> Harika gidiyorsun.'},
+  {e:'🚀',t:'<b>Listendeki kitaplar seni bekliyor.</b> Hazır mısın?'},
+];
+
+let S={books:[],yearlyGoal:20,notifSettings:{daily:false,weekly:false,list:false,dailyTime:'21:00',listTime:'19:00'}};
+let saving=false,editId=null,curStar=0,activeBookTab='read';
+
+// CANVAS BG
+(function(){
+  const canvas=document.getElementById('bgCanvas');
+  const ctx=canvas.getContext('2d');
+  let W,H,particles=[];
+  function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+  resize();window.addEventListener('resize',resize);
+  for(let i=0;i<30;i++){
+    particles.push({x:Math.random()*1000,y:Math.random()*1000,r:Math.random()*1.5+.5,vx:(Math.random()-.5)*.25,vy:(Math.random()-.5)*.25,c:['#ff8c42','#f5c542','#ff5fa0','#4f8eff'][Math.floor(Math.random()*4)]});
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    particles.forEach(p=>{
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0)p.x=W;if(p.x>W)p.x=0;
+      if(p.y<0)p.y=H;if(p.y>H)p.y=0;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=p.c;ctx.fill();
+    });
+    particles.forEach((p,i)=>{
+      particles.slice(i+1).forEach(q=>{
+        const d=Math.hypot(p.x-q.x,p.y-q.y);
+        if(d<110){ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.strokeStyle=`rgba(255,140,66,${(1-d/110)*.12})`;ctx.lineWidth=.5;ctx.stroke();}
+      });
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+function dot(s){const d=document.getElementById('syncDot');d.className='sync-dot'+(s==='ok'?' ok':s==='busy'?' busy':'');}
+async function save(){saving=true;dot('busy');try{await setDoc(REF,S);dot('ok');}catch(e){dot('');}saving=false;}
+onSnapshot(REF,snap=>{if(saving)return;if(snap.exists())S={...S,...snap.data()};renderAll();dot('ok');},()=>dot(''));
+
+function animateCount(el,target){
+  if(typeof target!=='number'){el.textContent=target;return;}
+  const start=parseInt(el.textContent)||0;const dur=600;const t0=performance.now();
+  function step(t){const p=Math.min((t-t0)/dur,1);const e=1-Math.pow(1-p,3);el.textContent=Math.round(start+(target-start)*e);if(p<1)requestAnimationFrame(step);}
+  requestAnimationFrame(step);
+}
+
+function confetti(x,y){
+  const colors=['#ff8c42','#f5c542','#2ecc8a','#4f8eff','#9b6dff','#ff5fa0'];
+  for(let i=0;i<14;i++){
+    const el=document.createElement('div');el.className='confetti-piece';
+    el.style.cssText=`left:${x+Math.random()*60-30}px;top:${y}px;background:${colors[Math.floor(Math.random()*colors.length)]};animation-delay:${Math.random()*.3}s;animation-duration:${1.2+Math.random()}s`;
+    document.body.appendChild(el);setTimeout(()=>el.remove(),2500);
+  }
+}
+
+function renderAll(){
+  const now=new Date();
+  document.getElementById('goalYear').textContent=now.getFullYear()+' Hedefi';
+  document.getElementById('yearLabel').textContent=now.getFullYear();
+  document.getElementById('goalInput').value=S.yearlyGoal||20;
+  const moti=MOTIS[Math.floor(Date.now()/86400000)%MOTIS.length];
+  document.getElementById('motiEmoji').textContent=moti.e;
+  document.getElementById('motiText').innerHTML=moti.t;
+  renderNextBook();renderStats();renderGoalRing();renderMonthChart();renderGenreDonut();populateGenreFilters();renderBooks();loadNotifSettings();
+}
+
+function renderNextBook(){
+  const toread=(S.books||[]).filter(b=>b.status==='toread');
+  const high=toread.filter(b=>b.priority==='high');
+  const next=high.length?high[0]:toread[0];
+  const el=document.getElementById('nextBookWrap');
+  if(!next){el.innerHTML='';return;}
+  el.innerHTML=`<div class="next-book" onclick="goPanel(1);switchBookTab('toread')">
+    <div class="nb-shine"></div>
+    <div class="nb-icon">📖</div>
+    <div class="nb-body">
+      <div class="nb-label">Sıradaki Kitap</div>
+      <div class="nb-title">${esc(next.title)}</div>
+      <div class="nb-author">${esc(next.author)}</div>
+    </div>
+    <div class="nb-arrow">›</div>
+  </div>`;
+}
+
+function renderStats(){
+  const read=(S.books||[]).filter(b=>b.status==='read');
+  const toread=(S.books||[]).filter(b=>b.status==='toread');
+  animateCount(document.getElementById('stRead'),read.length);
+  animateCount(document.getElementById('stToRead'),toread.length);
+  animateCount(document.getElementById('stTotal'),(S.books||[]).length);
+  const rated=read.filter(b=>b.rating);
+  const avg=rated.length?(rated.reduce((a,b)=>a+b.rating,0)/rated.length).toFixed(1):'—';
+  document.getElementById('stAvg').textContent=avg==='—'?'—':avg+'★';
+  document.getElementById('cntRead').textContent=read.length;
+  document.getElementById('cntToRead').textContent=toread.length;
+}
+
+function renderGoalRing(){
+  const now=new Date();const yr=now.getFullYear();
+  const readThisYear=(S.books||[]).filter(b=>b.status==='read'&&b.date&&b.date.startsWith(yr)).length;
+  const goal=S.yearlyGoal||20;
+  const pct=Math.min(100,Math.round((readThisYear/goal)*100));
+  const circ=226.19;
+  setTimeout(()=>{document.getElementById('goalFill').style.strokeDashoffset=circ-(pct/100)*circ;},100);
+  document.getElementById('goalPct').textContent=pct+'%';
+  document.getElementById('goalFrac').textContent=readThisYear+'/'+goal;
+  document.getElementById('goalSub').textContent=`Bu yıl ${goal} kitap okumayı hedefliyorsun`;
+  if(pct>=100)confetti(window.innerWidth/2,200);
+}
+
+function renderMonthChart(){
+  const now=new Date();const yr=now.getFullYear();const curM=now.getMonth();
+  const counts=Array(12).fill(0);
+  (S.books||[]).filter(b=>b.status==='read'&&b.date&&b.date.startsWith(yr)).forEach(b=>{
+    const m=parseInt(b.date.split('-')[1])-1;if(m>=0&&m<12)counts[m]++;
+  });
+  const max=Math.max(...counts,1);
+  document.getElementById('monthBars').innerHTML=counts.map((c,i)=>{
+    const h=Math.max(3,Math.round((c/max)*56));
+    const cls='m-bar'+(i===curM?' cur':c>0?' has':'');
+    return`<div class="m-col"><div class="${cls}" style="height:${h}px"></div></div>`;
+  }).join('');
+  document.getElementById('monthLabels').innerHTML=MONTHS.map((m,i)=>`<div class="m-lbl${i===curM?' cur':''}" style="flex:1;text-align:center">${m}</div>`).join('');
+}
+
+function renderGenreDonut(){
+  const read=(S.books||[]).filter(b=>b.status==='read');
+  const counts={};read.forEach(b=>{const g=b.genre||'other';counts[g]=(counts[g]||0)+1;});
+  const entries=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  const total=entries.reduce((a,e)=>a+e[1],0);
+  if(!total){document.getElementById('donutSvg').innerHTML='';document.getElementById('genreLegend').innerHTML='<div style="color:var(--muted);font-size:12px">Henüz kitap yok</div>';return;}
+  const r=30,cx=40,cy=40,circ=2*Math.PI*r;
+  let offset=0;
+  const arcs=entries.map((e,i)=>{const pct=e[1]/total;const dash=pct*circ;const arc=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${GCOLS[i]}" stroke-width="14" stroke-dasharray="${dash} ${circ-dash}" stroke-dashoffset="${-offset}" transform="rotate(-90 ${cx} ${cy})"/>`;offset+=dash;return arc;}).join('');
+  document.getElementById('donutSvg').innerHTML=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--border)" stroke-width="14"/>${arcs}`;
+  document.getElementById('genreLegend').innerHTML=entries.map((e,i)=>`<div class="g-row"><div class="g-dot" style="background:${GCOLS[i]}"></div><div class="g-name">${GENRES[e[0]]||e[0]}</div><div class="g-cnt">${e[1]}</div></div>`).join('');
+}
+
+function populateGenreFilters(){
+  const genres=[...new Set((S.books||[]).map(b=>b.genre).filter(Boolean))];
+  ['gnRead','gnToRead'].forEach(id=>{const sel=document.getElementById(id);const cur=sel.value;sel.innerHTML='<option value="">Tüm Türler</option>'+genres.map(g=>`<option value="${g}">${GENRES[g]||g}</option>`).join('');sel.value=cur;});
+}
+
+function getBooks(status){
+  const search=document.getElementById(status==='read'?'srRead':'srToRead').value.toLowerCase();
+  const genre=document.getElementById(status==='read'?'gnRead':'gnToRead').value;
+  const sort=document.getElementById(status==='read'?'sortRead':'sortToRead').value;
+  let books=(S.books||[]).filter(b=>b.status===status);
+  if(genre)books=books.filter(b=>b.genre===genre);
+  if(search)books=books.filter(b=>b.title.toLowerCase().includes(search)||b.author.toLowerCase().includes(search));
+  if(sort==='date-desc')books.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  else if(sort==='rating')books.sort((a,b)=>(b.rating||0)-(a.rating||0));
+  else if(sort==='title')books.sort((a,b)=>a.title.localeCompare(b.title));
+  else if(sort==='priority'){const p={high:0,normal:1,low:2};books.sort((a,b)=>(p[a.priority]||1)-(p[b.priority]||1));}
+  return books;
+}
+
+window.renderBooks=function(){renderGrid('read');renderGrid('toread');}
+
+function renderGrid(status){
+  const books=getBooks(status);
+  const grid=document.getElementById(status==='read'?'gridRead':'gridToRead');
+  if(!books.length){grid.innerHTML=`<div class="empty-state">${status==='read'?'Henüz okunan kitap yok':'Okuma listesi boş'}</div>`;return;}
+  grid.innerHTML=books.map((b,idx)=>bookCard(b,idx+1,status)).join('');
+}
+
+function bookCard(b,num,status){
+  const stars=b.rating?'★'.repeat(b.rating)+'☆'.repeat(5-b.rating):'';
+  const priB=status==='toread'&&b.priority==='high'?`<span class="pri-pill">★ Öncelik</span>`:'';
+  const dateStr=b.date?`<span class="read-date">${b.date}</span>`:'';
+  return`<div class="book-card gc-${b.genre||'other'}">
+    <div class="book-num">#${String(num).padStart(3,'0')}</div>
+    <div class="book-title">${esc(b.title)}</div>
+    <div class="book-author">${esc(b.author)}</div>
+    <span class="genre-pill">${GENRES[b.genre]||'Diğer'}</span>${priB}
+    ${stars?`<div class="book-stars">${stars}</div>`:''}
+    ${b.note?`<div class="book-note">${esc(b.note)}</div>`:''}
+    <div class="card-btns">
+      ${status==='toread'?`<button class="c-btn c-done" onclick="markRead('${b.id}')">✓ Okundu</button>`:''}
+      <button class="c-btn" onclick="openEdit('${b.id}')">Düzenle</button>
+      <button class="c-btn c-del" onclick="delBook('${b.id}')">Sil</button>
+      ${dateStr}
+    </div>
+  </div>`;
+}
+
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+// NOTIF
+function loadNotifSettings(){
+  const ns=S.notifSettings||{};
+  ['daily','weekly','list'].forEach(k=>{const t=document.getElementById('tog-'+k);if(t)t.className='toggle'+(ns[k]?' on':'');});
+  if(ns.dailyTime)document.getElementById('dailyTime').value=ns.dailyTime;
+  if(ns.listTime)document.getElementById('listTime').value=ns.listTime;
+  const pb=document.getElementById('permBtn');
+  if(Notification.permission==='granted')pb.textContent='✅ Bildirim İzni Verildi';
+  else if(Notification.permission==='denied')pb.textContent='❌ Bildirim İzni Reddedildi';
+}
+
+window.requestPermission=async function(){
+  if(!('Notification' in window)){alert('Tarayıcınız bildirimleri desteklemiyor.');return;}
+  const perm=await Notification.requestPermission();
+  loadNotifSettings();
+  if(perm==='granted'){new Notification('My Library 📚',{body:'Bildirimler aktif! Okumayı unutma.'});scheduleNotifications();}
+}
+
+window.toggleNotif=function(key){
+  if(!S.notifSettings)S.notifSettings={};
+  S.notifSettings[key]=!S.notifSettings[key];
+  save();loadNotifSettings();scheduleNotifications();
+}
+
+window.saveNotifSettings=function(){
+  if(!S.notifSettings)S.notifSettings={};
+  S.notifSettings.dailyTime=document.getElementById('dailyTime').value;
+  S.notifSettings.listTime=document.getElementById('listTime').value;
+  save();scheduleNotifications();
+}
+
+function scheduleNotifications(){
+  if(Notification.permission!=='granted')return;
+  const ns=S.notifSettings||{};
+  clearTimeout(window._dailyT);clearTimeout(window._weeklyT);clearTimeout(window._listT);
+
+  function msUntil(t){const[h,m]=t.split(':').map(Number);const now=new Date();const tgt=new Date();tgt.setHours(h,m,0,0);if(tgt<=now)tgt.setDate(tgt.getDate()+1);return tgt-now;}
+
+  if(ns.daily&&ns.dailyTime){
+    window._dailyT=setTimeout(()=>{
+      new Notification('My Library 📖',{body:'Bugün okuma vakti! Listende bekleyen kitaplar var.'});
+      scheduleNotifications();
+    },msUntil(ns.dailyTime));
+  }
+
+  if(ns.list&&ns.listTime){
+    window._listT=setTimeout(()=>{
+      const toread=(S.books||[]).filter(b=>b.status==='toread').length;
+      if(toread>0)new Notification('📋 Okunacaklar Listesi',{body:`${toread} kitap seni bekliyor! Bir sonrakini almaya hazır mısın?`});
+      scheduleNotifications();
+    },msUntil(ns.listTime));
+  }
+
+  if(ns.weekly){
+    const now=new Date();const monday=new Date();
+    monday.setDate(now.getDate()+(8-now.getDay())%7||7);monday.setHours(9,0,0,0);
+    window._weeklyT=setTimeout(()=>{
+      const now2=new Date();const yr=now2.getFullYear();
+      const readThisYear=(S.books||[]).filter(b=>b.status==='read'&&b.date&&b.date.startsWith(yr)).length;
+      const goal=S.yearlyGoal||20;const pct=Math.round((readThisYear/goal)*100);
+      new Notification('📊 Haftalık Hedef Özeti',{body:`${yr} yılı hedefinin %${pct}'ini tamamladın! (${readThisYear}/${goal} kitap)`});
+    },monday-now);
+  }
+}
+
+window.goPanel=function(i){
+  ['pStats','pBooks','pNotif'].forEach((id,j)=>document.getElementById(id).classList.toggle('active',j===i));
+  [0,1,2].forEach(j=>document.getElementById('bn'+j).classList.toggle('active',j===i));
+}
+
+window.switchBookTab=function(tab){
+  activeBookTab=tab;
+  document.getElementById('tbRead').classList.toggle('active',tab==='read');
+  document.getElementById('tbToRead').classList.toggle('active',tab==='toread');
+  document.getElementById('panelRead').style.display=tab==='read'?'block':'none';
+  document.getElementById('panelToRead').style.display=tab==='toread'?'block':'none';
+}
+
+window.setStar=function(v){curStar=curStar===v?0:v;document.querySelectorAll('.star-b').forEach(b=>b.classList.toggle('on',parseInt(b.dataset.v)<=curStar));}
+window.setGoal=function(){const v=parseInt(document.getElementById('goalInput').value);if(!v||v<1)return;S.yearlyGoal=v;save();renderGoalRing();}
+
+window.openAdd=function(){
+  editId=null;curStar=0;
+  document.getElementById('modalTitle').textContent='Kitap Ekle';
+  ['fTitle','fAuthor','fNote'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('fGenre').value='roman';document.getElementById('fStatus').value='read';
+  document.getElementById('fPriority').value='normal';document.getElementById('fDate').value=new Date().toISOString().slice(0,7);
+  document.querySelectorAll('.star-b').forEach(b=>b.classList.remove('on'));
+  document.getElementById('addModal').classList.add('open');
+}
+
+window.openEdit=function(id){
+  const b=(S.books||[]).find(x=>x.id===id);if(!b)return;
+  editId=id;curStar=b.rating||0;
+  document.getElementById('modalTitle').textContent='Düzenle';
+  document.getElementById('fTitle').value=b.title;document.getElementById('fAuthor').value=b.author;
+  document.getElementById('fGenre').value=b.genre||'other';document.getElementById('fStatus').value=b.status;
+  document.getElementById('fDate').value=b.date||'';document.getElementById('fPriority').value=b.priority||'normal';
+  document.getElementById('fNote').value=b.note||'';
+  document.querySelectorAll('.star-b').forEach(b=>b.classList.toggle('on',parseInt(b.dataset.v)<=curStar));
+  document.getElementById('addModal').classList.add('open');
+}
+
+window.closeAdd=function(){document.getElementById('addModal').classList.remove('open');}
+document.getElementById('addModal').addEventListener('click',e=>{if(e.target===document.getElementById('addModal'))window.closeAdd();});
+
+window.saveBook=function(){
+  const title=document.getElementById('fTitle').value.trim();const author=document.getElementById('fAuthor').value.trim();
+  if(!title||!author){alert('Kitap adı ve yazar zorunlu.');return;}
+  const book={id:editId||(Date.now().toString(36)+Math.random().toString(36).slice(2)),title,author,genre:document.getElementById('fGenre').value,status:document.getElementById('fStatus').value,date:document.getElementById('fDate').value,priority:document.getElementById('fPriority').value,rating:curStar||null,note:document.getElementById('fNote').value.trim(),addedAt:editId?((S.books||[]).find(b=>b.id===editId)?.addedAt||Date.now()):Date.now()};
+  if(!S.books)S.books=[];
+  if(editId){const i=S.books.findIndex(b=>b.id===editId);S.books[i]=book;}else S.books.push(book);
+  save();populateGenreFilters();renderAll();window.closeAdd();
+  if(!editId)confetti(window.innerWidth/2,200);
+}
+
+window.delBook=function(id){if(!confirm('Bu kitabı silmek istediğine emin misin?'))return;S.books=(S.books||[]).filter(b=>b.id!==id);save();renderAll();}
+
+window.markRead=function(id){
+  const b=(S.books||[]).find(x=>x.id===id);if(!b)return;
+  b.status='read';b.date=new Date().toISOString().slice(0,7);
+  save();renderAll();window.switchBookTab('read');confetti(window.innerWidth/2,300);
+}
+
+document.getElementById('fDate').value=new Date().toISOString().slice(0,7);
+renderAll();scheduleNotifications();
+</script>
+</body>
+</html>
