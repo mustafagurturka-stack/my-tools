@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="tr" data-theme="dark">
+<html lang="tr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="English Tracker">
-<meta name="theme-color" content="#0f1117" id="themeColorMeta">
+<meta name="theme-color" content="#0f1117">
 <link rel="manifest" href="manifest.json">
 <title>English Tracker</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -17,21 +17,15 @@
   --blue:#4f8eff;--purple:#9b6dff;--green:#2ecc8a;--yellow:#f5c542;
   --red:#ff5470;--cyan:#29e0d0;--orange:#ff8c42;
 }
-[data-theme="light"]{
-  --bg:#f0f4ff;--card:#ffffff;--card2:#e8eeff;--border:#d0d8f0;
-  --text:#0a0f2a;--text2:#2d3760;--muted:#6b7694;--dim:#aab4d8;
-}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:15px;line-height:1.5;min-height:100vh;padding-bottom:90px;overflow-x:hidden;transition:background .3s,color .3s}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:15px;line-height:1.5;min-height:100vh;padding-bottom:90px;overflow-x:hidden}
 
 /* CANVAS BG */
-#bgCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.35;transition:opacity .3s}
-[data-theme="light"] #bgCanvas{opacity:.12}
+#bgCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.35}
 .wrap{position:relative;z-index:1}
 
 /* NAV */
-.topnav{position:sticky;top:0;z-index:100;background:rgba(15,17,23,.95);border-bottom:1px solid var(--border);padding:0 18px;height:56px;display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(12px);transition:background .3s}
-[data-theme="light"] .topnav{background:rgba(240,244,255,.96)}
+.topnav{position:sticky;top:0;z-index:100;background:rgba(15,17,23,.95);border-bottom:1px solid var(--border);padding:0 18px;height:56px;display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(12px)}
 .nav-logo{font-size:17px;font-weight:700;letter-spacing:-.3px}
 .nav-logo span{color:var(--blue)}
 .nav-right{display:flex;align-items:center;gap:10px}
@@ -41,8 +35,6 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 .level-btn{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;padding:5px 13px;border-radius:6px;border:1px solid var(--border);color:var(--text2);cursor:pointer;background:var(--card2);letter-spacing:.5px;transition:all .2s}
 .level-btn:hover{border-color:var(--blue);color:var(--blue)}
-.theme-btn{background:none;border:1px solid var(--border);border-radius:6px;padding:5px 9px;font-size:15px;cursor:pointer;transition:all .2s;color:var(--text2)}
-.theme-btn:hover{border-color:var(--blue)}
 
 /* MOTIVASYON BANNER */
 .moti-banner{margin:14px 16px 0;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;animation:slideDown .5s ease}
@@ -147,9 +139,6 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
 .sb-listening{background:rgba(255,140,66,.1);color:var(--orange)}
 .del-x{background:none;border:none;color:var(--dim);cursor:pointer;font-size:18px;padding:2px 4px;flex-shrink:0;line-height:1;transition:color .2s}
 .del-x:hover{color:var(--red)}
-.edit-x{background:none;border:none;color:var(--dim);cursor:pointer;font-size:14px;padding:2px 4px;flex-shrink:0;line-height:1;transition:color .2s}
-.edit-x:hover{color:var(--blue)}
-.row-acts{display:flex;align-items:center;gap:1px;flex-shrink:0}
 
 /* TODO */
 .todo-tabs{display:flex;background:var(--card2);border-radius:8px;padding:3px;gap:3px;margin-bottom:12px}
@@ -179,11 +168,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
 .v-word{font-size:14px;font-weight:600}
 .v-mean{font-size:12px;color:var(--muted);margin-top:2px}
 .v-ex{font-size:11px;color:var(--cyan);margin-top:3px;font-style:italic}
-.v-actions{position:absolute;top:7px;right:4px;display:flex;gap:0}
-.v-del{background:none;border:none;color:var(--dim);cursor:pointer;font-size:14px;transition:color .2s;padding:2px 4px}
+.v-del{position:absolute;top:7px;right:8px;background:none;border:none;color:var(--dim);cursor:pointer;font-size:14px;transition:color .2s}
 .v-del:hover{color:var(--red)}
-.v-edit{background:none;border:none;color:var(--dim);cursor:pointer;font-size:12px;transition:color .2s;padding:2px 4px}
-.v-edit:hover{color:var(--blue)}
 
 /* NOTES */
 .notes-ta{width:100%;background:transparent;border:none;color:var(--text2);font-family:'Inter',sans-serif;font-size:14px;line-height:1.7;padding:14px 16px;outline:none;resize:none;min-height:100px}
@@ -238,8 +224,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
 .skill-row-edit input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--blue);cursor:pointer;border:2px solid var(--bg)}
 
 /* BOTTOM NAV */
-.bnav{position:fixed;bottom:0;left:0;right:0;background:rgba(15,17,23,.97);border-top:1px solid var(--border);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom);backdrop-filter:blur(12px);transition:background .3s}
-[data-theme="light"] .bnav{background:rgba(240,244,255,.97)}
+.bnav{position:fixed;bottom:0;left:0;right:0;background:rgba(15,17,23,.97);border-top:1px solid var(--border);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom);backdrop-filter:blur(12px)}
 .bnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:9px 0;cursor:pointer;color:var(--dim);font-size:9px;font-family:'JetBrains Mono',monospace;letter-spacing:.5px;text-transform:uppercase;gap:3px;border:none;background:none;transition:color .2s}
 .bnav-btn.active{color:var(--blue)}
 .bnav-icon{font-size:19px;line-height:1}
@@ -254,7 +239,6 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
   <div class="nav-logo">English<span>+</span></div>
   <div class="nav-right">
     <div class="sync-dot" id="syncDot"></div>
-    <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">☀️</button>
     <button class="level-btn" id="lvlBtn" onclick="cycleLvl()">A2</button>
   </div>
 </nav>
@@ -275,28 +259,6 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
       <div class="streak-warning" id="streakWarn" style="display:none">⚠ Bugün çalışmazsan serin kırılır!</div>
     </div>
     <div class="streak-best" id="streakBest">En iyi: 0 gün</div>
-  </div>
-
-  <!-- GÜNLÜK HEDEF -->
-  <div class="section">
-    <div class="sec-head">
-      <div class="sec-title">⚡ Günlük Hedef</div>
-      <div style="display:flex;align-items:center;gap:6px">
-        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)">Hedef:</span>
-        <input type="number" id="dailyGoalInput" min="5" max="480" style="width:52px;background:var(--card2);border:1px solid var(--border);color:var(--text);padding:4px 6px;font-family:'JetBrains Mono',monospace;font-size:12px;border-radius:6px;outline:none;text-align:center" onchange="saveDailyGoal()">
-        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)">dk</span>
-      </div>
-    </div>
-    <div class="box" style="padding:14px 16px">
-      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px">
-        <span id="dailyGoalDone" style="font-size:22px;font-weight:700;color:var(--blue)">0 dk</span>
-        <span id="dailyGoalPct" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted)">%0</span>
-      </div>
-      <div style="height:8px;background:var(--card2);border-radius:4px;overflow:hidden">
-        <div id="dailyGoalBar" style="height:100%;border-radius:4px;background:linear-gradient(90deg,var(--blue),var(--purple));width:0%;transition:width .8s ease"></div>
-      </div>
-      <div id="dailyGoalMsg" style="font-size:12px;color:var(--muted);margin-top:8px"></div>
-    </div>
   </div>
 
   <div class="stats-row">
@@ -382,10 +344,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
   <div class="section" style="padding-top:16px">
     <div class="sec-head">
       <div class="sec-title">Kelime Defteri</div>
-      <div style="display:flex;gap:6px">
-        <button class="sec-btn outline" onclick="openModal('quizModal')">🎯 Quiz</button>
-        <button class="sec-btn" onclick="openModal('vocabModal')">+ Kelime</button>
-      </div>
+      <button class="sec-btn" onclick="openModal('vocabModal')">+ Kelime</button>
     </div>
     <div class="box"><div class="vocab-grid" id="vocabGrid"></div></div>
   </div>
@@ -519,99 +478,6 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
     </div>
   </div>
 </div>
-
-<!-- EDIT SESSION MODAL -->
-<div class="overlay" id="editSessionModal">
-  <div class="modal">
-    <div class="modal-bar"></div>
-    <div class="modal-title">✏️ Oturum Düzenle</div>
-    <input type="hidden" id="esIdx">
-    <div class="fg"><label>Tarih</label><input type="date" id="esDate"></div>
-    <div class="fg"><label>Konu</label><input type="text" id="esTopic"></div>
-    <div class="frow">
-      <div class="fg"><label>Tür</label>
-        <select id="esType">
-          <option value="grammar">Grammar</option><option value="vocab">Vocabulary</option>
-          <option value="speaking">Speaking</option><option value="writing">Writing</option>
-          <option value="reading">Reading</option><option value="listening">Listening</option>
-        </select>
-      </div>
-      <div class="fg"><label>Süre (dk)</label><input type="number" id="esDur" min="1"></div>
-    </div>
-    <div class="fg"><label>Puan (1–10)</label><input type="number" id="esScore" min="1" max="10"></div>
-    <div class="fg"><label>Not</label><textarea id="esNote"></textarea></div>
-    <div class="mactions">
-      <button class="btn-c" onclick="closeModal('editSessionModal')">İptal</button>
-      <button class="btn-s" onclick="saveEditSess()">Güncelle ✓</button>
-    </div>
-  </div>
-</div>
-
-<!-- EDIT TODO MODAL -->
-<div class="overlay" id="editTodoModal">
-  <div class="modal">
-    <div class="modal-bar"></div>
-    <div class="modal-title">✏️ Görev Düzenle</div>
-    <input type="hidden" id="etIdx">
-    <div class="fg"><label>Görev Adı</label><input type="text" id="etTitle"></div>
-    <div class="fg"><label>Açıklama</label><textarea id="etDesc"></textarea></div>
-    <div class="frow">
-      <div class="fg"><label>Durum</label>
-        <select id="etStatus">
-          <option value="todo">📋 Yapılacak</option>
-          <option value="doing">🔄 Yapılıyor</option>
-          <option value="done">✅ Tamamlandı</option>
-        </select>
-      </div>
-      <div class="fg"><label>Tarih</label><input type="date" id="etDate"></div>
-    </div>
-    <div class="mactions">
-      <button class="btn-c" onclick="closeModal('editTodoModal')">İptal</button>
-      <button class="btn-s" onclick="saveEditTodo()">Güncelle ✓</button>
-    </div>
-  </div>
-</div>
-
-<!-- EDIT VOCAB MODAL -->
-<div class="overlay" id="editVocabModal">
-  <div class="modal">
-    <div class="modal-bar"></div>
-    <div class="modal-title">✏️ Kelime Düzenle</div>
-    <input type="hidden" id="evIdx">
-    <div class="fg"><label>İngilizce Kelime</label><input type="text" id="evWord"></div>
-    <div class="fg"><label>Türkçe Anlamı</label><input type="text" id="evMean"></div>
-    <div class="fg"><label>Örnek Cümle</label><input type="text" id="evEx"></div>
-    <div class="mactions">
-      <button class="btn-c" onclick="closeModal('editVocabModal')">İptal</button>
-      <button class="btn-s" onclick="saveEditVocab()">Güncelle ✓</button>
-    </div>
-  </div>
-</div>
-
-<!-- QUIZ MODAL -->
-<div class="overlay" id="quizModal">
-  <div class="modal">
-    <div class="modal-bar"></div>
-    <div class="modal-title">🎯 Kelime Quiz</div>
-    <div id="quizContent">
-      <div style="text-align:center;padding:10px 0">
-        <div style="font-size:13px;color:var(--muted);margin-bottom:16px" id="quizProgress">0 / 0</div>
-        <div style="font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--blue);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">Bu kelimenin Türkçesi nedir?</div>
-        <div style="font-size:28px;font-weight:700;color:var(--text);margin-bottom:20px;min-height:40px" id="quizWord"></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px" id="quizOptions"></div>
-        <div style="margin-top:16px;min-height:40px" id="quizFeedback"></div>
-        <button class="btn-s" id="quizNextBtn" style="display:none;margin-top:10px;width:100%" onclick="nextQuizQ()">Sonraki →</button>
-      </div>
-    </div>
-    <div id="quizResult" style="display:none;text-align:center;padding:10px 0">
-      <div style="font-size:40px;margin-bottom:10px" id="quizResultEmoji">🎉</div>
-      <div style="font-size:20px;font-weight:700;margin-bottom:6px" id="quizResultTitle"></div>
-      <div style="font-size:14px;color:var(--muted);margin-bottom:20px" id="quizResultSub"></div>
-      <button class="btn-s" onclick="startQuiz()" style="width:100%;margin-bottom:8px">Tekrar Başla</button>
-      <button class="btn-c" onclick="closeModal('quizModal')" style="width:100%">Kapat</button>
-    </div>
-  </div>
-</div>
 </div>
 
 <script type="module">
@@ -636,16 +502,8 @@ const MOTIS=[
   {e:'💪',t:'<b>Güçlüsün!</b> Bugün de bir şeyler öğren.'},
 ];
 
-let S={lvlIdx:1,skills:{grammar:20,vocab:20,speaking:15,writing:20,reading:25,listening:20},sessions:[],todos:[],vocab:[],notes:'',bestStreak:0,theme:'dark',dailyGoalMins:30,notifSettings:{daily:false,streak:false,weekly:false,dailyTime:'20:00',streakTime:'21:00'}};
+let S={lvlIdx:1,skills:{grammar:20,vocab:20,speaking:15,writing:20,reading:25,listening:20},sessions:[],todos:[],vocab:[],notes:'',bestStreak:0,notifSettings:{daily:false,streak:false,weekly:false,dailyTime:'20:00',streakTime:'21:00'}};
 let saving=false,todoFilter='all',prevMins=0;
-
-function applyTheme(){
-  const t=S.theme||'dark';
-  document.documentElement.setAttribute('data-theme',t);
-  document.getElementById('themeBtn').textContent=t==='dark'?'☀️':'🌙';
-  document.getElementById('themeColorMeta').setAttribute('content',t==='dark'?'#0f1117':'#f0f4ff');
-}
-window.toggleTheme=function(){S.theme=S.theme==='dark'?'light':'dark';applyTheme();save();}
 
 // CANVAS BG
 (function(){
@@ -694,15 +552,12 @@ function animateCount(el,target){
 }
 
 function renderAll(){
-  applyTheme();
   document.getElementById('lvlBtn').textContent=(LEVELS[S.lvlIdx||1]||LEVELS[1])[0];
   const moti=MOTIS[Math.floor(Date.now()/86400000)%MOTIS.length];
   document.getElementById('motiEmoji').textContent=moti.e;
   document.getElementById('motiText').innerHTML=moti.t;
   renderStreak();renderStats();renderWOD();renderWeekChart();renderMonthChart();renderRings();renderSessions();renderTodos();renderVocab();
-  renderDailyGoal();
   document.getElementById('notesArea').value=S.notes||'';
-  document.getElementById('dailyGoalInput').value=S.dailyGoalMins||30;
   loadNotifSettings();
 }
 
@@ -844,10 +699,7 @@ function renderSessions(){
         <div class="s-meta">${s.date||''} · ${s.dur||'?'} dk · ${s.score||'?'}/10</div>
       </div>
       <span class="s-badge sb-${s.type}">${s.type}</span>
-      <div class="row-acts">
-        <button class="edit-x" onclick="editSess(${i})" title="Düzenle">✏️</button>
-        <button class="del-x" onclick="delSess(${i})">×</button>
-      </div>
+      <button class="del-x" onclick="delSess(${i})">×</button>
     </div>`;
   }).join('');
 }
@@ -869,10 +721,7 @@ function renderTodos(){
         ${t.date?`<div class="todo-date">${t.date}</div>`:''}
       </div>
       <span class="todo-sbadge ${bgs[t.status]}">${labels[t.status]}</span>
-      <div class="row-acts">
-        <button class="edit-x" onclick="event.stopPropagation();editTodo(${realIdx})" title="Düzenle">✏️</button>
-        <button class="del-x" onclick="event.stopPropagation();delTodo(${realIdx})">×</button>
-      </div>
+      <button class="del-x" onclick="event.stopPropagation();delTodo(${realIdx})">×</button>
     </div>`;
   }).join('');
 }
@@ -883,10 +732,7 @@ function renderVocab(){
   if(!vocab.length){el.innerHTML='<div class="empty" style="grid-column:1/-1">Henüz kelime eklenmedi</div>';return;}
   el.innerHTML=vocab.map((v,i)=>`
     <div class="vocab-card">
-      <div class="v-actions">
-        <button class="v-edit" onclick="editVocab(${i})" title="Düzenle">✏️</button>
-        <button class="v-del" onclick="delVocab(${i})">×</button>
-      </div>
+      <button class="v-del" onclick="delVocab(${i})">×</button>
       <div class="v-word">${esc(v.word)}</div>
       <div class="v-mean">${esc(v.mean)}</div>
       ${v.ex?`<div class="v-ex">${esc(v.ex)}</div>`:''}
@@ -996,6 +842,18 @@ window.goPanel=function(i){
   [0,1,2,3,4].forEach(j=>document.getElementById('bn'+j).classList.toggle('active',j===i));
 }
 
+window.openModal=function(id){
+  if(id==='skillModal'){
+    document.getElementById('skillEditWrap').innerHTML=SKILLS.map((sk,i)=>{
+      const v=(S.skills||{})[sk.k]||0;
+      return`<div class="skill-row-edit">
+        <label><span>${sk.l}</span><b id="sv${i}">${v}%</b></label>
+        <input type="range" min="0" max="100" step="1" value="${v}" id="si${i}" oninput="document.getElementById('sv${i}').textContent=this.value+'%'" style="accent-color:${sk.c}">
+      </div>`;
+    }).join('');
+  }
+  document.getElementById(id).classList.add('open');
+}
 window.closeModal=function(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.overlay').forEach(el=>el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open');}));
 
@@ -1043,55 +901,6 @@ window.addVocab=function(){
 }
 window.delVocab=function(i){S.vocab.splice(i,1);save();renderVocab();renderAll();}
 
-window.editSess=function(i){
-  const s=S.sessions[i];
-  document.getElementById('esIdx').value=i;
-  document.getElementById('esDate').value=s.date||'';
-  document.getElementById('esTopic').value=s.topic||'';
-  document.getElementById('esType').value=s.type||'grammar';
-  document.getElementById('esDur').value=s.dur||'';
-  document.getElementById('esScore').value=s.score||'';
-  document.getElementById('esNote').value=s.note||'';
-  openModal('editSessionModal');
-}
-window.saveEditSess=function(){
-  const i=parseInt(document.getElementById('esIdx').value);
-  const topic=document.getElementById('esTopic').value.trim();if(!topic)return;
-  S.sessions[i]={...S.sessions[i],date:document.getElementById('esDate').value,topic,type:document.getElementById('esType').value,dur:document.getElementById('esDur').value,score:document.getElementById('esScore').value,note:document.getElementById('esNote').value.trim()};
-  save();renderAll();closeModal('editSessionModal');
-}
-
-window.editTodo=function(i){
-  const t=S.todos[i];
-  document.getElementById('etIdx').value=i;
-  document.getElementById('etTitle').value=t.title||'';
-  document.getElementById('etDesc').value=t.desc||'';
-  document.getElementById('etStatus').value=t.status||'todo';
-  document.getElementById('etDate').value=t.date||'';
-  openModal('editTodoModal');
-}
-window.saveEditTodo=function(){
-  const i=parseInt(document.getElementById('etIdx').value);
-  const title=document.getElementById('etTitle').value.trim();if(!title)return;
-  S.todos[i]={...S.todos[i],title,desc:document.getElementById('etDesc').value.trim(),status:document.getElementById('etStatus').value,date:document.getElementById('etDate').value};
-  save();renderAll();closeModal('editTodoModal');
-}
-
-window.editVocab=function(i){
-  const v=S.vocab[i];
-  document.getElementById('evIdx').value=i;
-  document.getElementById('evWord').value=v.word||'';
-  document.getElementById('evMean').value=v.mean||'';
-  document.getElementById('evEx').value=v.ex||'';
-  openModal('editVocabModal');
-}
-window.saveEditVocab=function(){
-  const i=parseInt(document.getElementById('evIdx').value);
-  const word=document.getElementById('evWord').value.trim();if(!word)return;
-  S.vocab[i]={word,mean:document.getElementById('evMean').value.trim(),ex:document.getElementById('evEx').value.trim()};
-  save();renderVocab();renderAll();closeModal('editVocabModal');
-}
-
 window.saveSkills=function(){
   if(!S.skills)S.skills={};
   SKILLS.forEach((sk,i)=>{S.skills[sk.k]=parseInt(document.getElementById('si'+i).value);});
@@ -1100,99 +909,7 @@ window.saveSkills=function(){
 
 document.getElementById('notesArea').addEventListener('input',function(){S.notes=this.value;save();});
 document.getElementById('sDate').value=new Date().toISOString().split('T')[0];
-
-// ── DAILY GOAL ──
-function renderDailyGoal(){
-  const goal=S.dailyGoalMins||30;
-  const today=new Date().toISOString().split('T')[0];
-  const done=(S.sessions||[]).filter(s=>s.date===today).reduce((a,s)=>a+(parseInt(s.dur)||0),0);
-  const pct=Math.min(100,Math.round((done/goal)*100));
-  document.getElementById('dailyGoalDone').textContent=done+' dk';
-  document.getElementById('dailyGoalPct').textContent='%'+pct;
-  document.getElementById('dailyGoalBar').style.width=pct+'%';
-  let msg='';
-  if(done===0)msg='💪 Bugün henüz çalışmadın. Hadi başla!';
-  else if(pct<50)msg='🔥 İyi başlangıç! Devam et.';
-  else if(pct<100)msg='⚡ Hedefe yaklaşıyorsun!';
-  else msg='🎉 Günlük hedefe ulaştın! Harika iş!';
-  document.getElementById('dailyGoalMsg').textContent=msg;
-  if(pct>=100)document.getElementById('dailyGoalBar').style.background='linear-gradient(90deg,var(--green),var(--cyan))';
-}
-window.saveDailyGoal=function(){
-  S.dailyGoalMins=parseInt(document.getElementById('dailyGoalInput').value)||30;
-  save();renderDailyGoal();
-}
-
-// ── QUIZ ──
-let quizQueue=[],quizIdx=0,quizScore=0;
-window.startQuiz=function(){
-  const vocab=S.vocab||[];
-  if(vocab.length<2){alert('Quiz için en az 2 kelime gerekli!');return;}
-  quizQueue=[...vocab].sort(()=>Math.random()-.5).slice(0,Math.min(10,vocab.length));
-  quizIdx=0;quizScore=0;
-  document.getElementById('quizContent').style.display='block';
-  document.getElementById('quizResult').style.display='none';
-  showQuizQ();
-}
-function showQuizQ(){
-  const q=quizQueue[quizIdx];
-  const vocab=S.vocab||[];
-  document.getElementById('quizProgress').textContent=(quizIdx+1)+' / '+quizQueue.length;
-  document.getElementById('quizWord').textContent=q.word;
-  document.getElementById('quizFeedback').innerHTML='';
-  document.getElementById('quizNextBtn').style.display='none';
-  // 4 seçenek: 1 doğru + 3 yanlış
-  const wrong=vocab.filter(v=>v.word!==q.word).sort(()=>Math.random()-.5).slice(0,3);
-  const opts=[...wrong,q].sort(()=>Math.random()-.5);
-  document.getElementById('quizOptions').innerHTML=opts.map((o,i)=>`
-    <button onclick="checkQuiz(this,'${o.mean.replace(/'/g,"\\'")}','${q.mean.replace(/'/g,"\\'")}')"
-      style="background:var(--card2);border:1.5px solid var(--border);color:var(--text);padding:10px 8px;border-radius:9px;cursor:pointer;font-size:13px;font-family:'Inter',sans-serif;transition:all .2s">
-      ${esc(o.mean)}
-    </button>`).join('');
-}
-window.checkQuiz=function(btn,selected,correct){
-  document.querySelectorAll('#quizOptions button').forEach(b=>b.disabled=true);
-  if(selected===correct){
-    btn.style.background='rgba(46,204,138,.2)';btn.style.borderColor='var(--green)';
-    document.getElementById('quizFeedback').innerHTML='<span style="color:var(--green);font-weight:700;font-size:16px">✓ Doğru!</span>';
-    quizScore++;
-  } else {
-    btn.style.background='rgba(255,84,112,.2)';btn.style.borderColor='var(--red)';
-    document.querySelectorAll('#quizOptions button').forEach(b=>{
-      if(b.textContent.trim()===correct){b.style.background='rgba(46,204,138,.15)';b.style.borderColor='var(--green)';}
-    });
-    document.getElementById('quizFeedback').innerHTML=`<span style="color:var(--red);font-weight:700;font-size:15px">✗ Yanlış</span><br><span style="font-size:12px;color:var(--muted)">Doğru: ${esc(correct)}</span>`;
-  }
-  document.getElementById('quizNextBtn').style.display='block';
-}
-window.nextQuizQ=function(){
-  quizIdx++;
-  if(quizIdx>=quizQueue.length){
-    const pct=Math.round((quizScore/quizQueue.length)*100);
-    document.getElementById('quizContent').style.display='none';
-    document.getElementById('quizResult').style.display='block';
-    document.getElementById('quizResultEmoji').textContent=pct>=80?'🏆':pct>=50?'👍':'📚';
-    document.getElementById('quizResultTitle').textContent=quizScore+' / '+quizQueue.length+' Doğru';
-    document.getElementById('quizResultSub').textContent='%'+pct+' başarı · '+(pct>=80?'Harika! Kelimeler yerleşmiş.':pct>=50?'İyi gidiyorsun, biraz daha çalış.':'Kelimeleri tekrar gözden geçir.');
-    if(pct>=80)confetti(window.innerWidth/2,300);
-  } else {
-    showQuizQ();
-  }
-}
-
-window.openModal=function(id){
-  if(id==='skillModal'){
-    document.getElementById('skillEditWrap').innerHTML=SKILLS.map((sk,i)=>{
-      const v=(S.skills||{})[sk.k]||0;
-      return`<div class="skill-row-edit">
-        <label><span>${sk.l}</span><b id="sv${i}">${v}%</b></label>
-        <input type="range" min="0" max="100" step="1" value="${v}" id="si${i}" oninput="document.getElementById('sv${i}').textContent=this.value+'%'" style="accent-color:${sk.c}">
-      </div>`;
-    }).join('');
-  }
-  if(id==='quizModal')startQuiz();
-  document.getElementById(id).classList.add('open');
-}
+renderAll();scheduleNotifications();
 </script>
 </body>
 </html>
