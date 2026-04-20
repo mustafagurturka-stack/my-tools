@@ -117,6 +117,9 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
 .er-bmi{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);flex-shrink:0}
 .del-x{background:none;border:none;color:var(--dim);cursor:pointer;font-size:18px;padding:2px 4px;transition:color .2s;line-height:1;flex-shrink:0}
 .del-x:hover{color:var(--red)}
+.edit-x{background:none;border:none;color:var(--dim);cursor:pointer;font-size:15px;padding:2px 4px;transition:color .2s;line-height:1;flex-shrink:0}
+.edit-x:hover{color:var(--blue)}
+.row-actions{display:flex;align-items:center;gap:2px;flex-shrink:0}
 
 /* WORKOUT */
 .wo-item{display:flex;align-items:flex-start;gap:10px;padding:11px 16px;border-bottom:1px solid var(--border);animation:fadeUp .3s ease}
@@ -212,8 +215,26 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
 .bnav-btn.active{color:var(--blue)}
 .bnav-icon{font-size:20px;line-height:1}
 
-/* TABS */
-.tab-bar{display:flex;background:var(--surface2);border-radius:10px;padding:3px;gap:3px;margin:14px 16px 0}
+/* FORECAST & REPORT CARDS */
+.forecast-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.forecast-row:last-child{margin-bottom:0}
+.forecast-icon{font-size:22px;flex-shrink:0}
+.forecast-body{flex:1}
+.forecast-label{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.5px}
+.forecast-val{font-size:16px;font-weight:700;margin-top:1px}
+.forecast-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.report-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.report-item{background:var(--surface2);border-radius:var(--radius-sm);padding:10px 12px}
+.report-item-label{font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.report-item-val{font-size:18px;font-weight:700}
+.report-item-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.monthly-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)}
+.monthly-row:last-child{border-bottom:none}
+.monthly-row-label{font-size:13px;color:var(--text2)}
+.monthly-row-val{font-size:13px;font-weight:700;font-family:'JetBrains Mono',monospace}
+
+/* PANEL */
+.panel{display:none}.panel.active{display:block}
 .tab-btn{flex:1;font-size:12px;font-weight:600;padding:8px;border-radius:8px;border:none;background:transparent;color:var(--muted);cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif}
 .tab-btn.active{background:var(--surface);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.1)}
 .panel{display:none}.panel.active{display:block}
@@ -273,6 +294,25 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
     <div class="sec-head"><div class="sec-title">6 Aylık Hedefler</div></div>
     <div class="goals-grid" id="goalsGrid"></div>
   </div>
+
+  <!-- HEDEF TARİH TAHMİNİ -->
+  <div class="section">
+    <div class="sec-head"><div class="sec-title">🎯 Hedefe Ne Zaman Ulaşırsın?</div></div>
+    <div class="card" id="goalForecastCard" style="padding:16px"></div>
+  </div>
+
+  <!-- HAFTALIK RAPOR -->
+  <div class="section">
+    <div class="sec-head"><div class="sec-title">📋 Haftalık Rapor</div></div>
+    <div class="card" id="weeklyReportCard" style="padding:16px"></div>
+  </div>
+
+  <!-- AYLIK ÖZET -->
+  <div class="section">
+    <div class="sec-head"><div class="sec-title">📅 Aylık Özet</div></div>
+    <div class="card" id="monthlyCard" style="padding:16px"></div>
+  </div>
+
   <div class="section">
     <div class="sec-head"><div class="sec-title">Kilo Grafiği</div></div>
     <div class="chart-card"><div class="chart-wrap"><canvas id="weightChart"></canvas></div></div>
@@ -441,6 +481,85 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
   </div>
 </div>
 
+<!-- EDIT WEIGHT MODAL -->
+<div class="overlay" id="editWeightModal">
+  <div class="modal">
+    <div class="modal-bar"></div>
+    <div class="modal-title">✏️ Tartı Düzenle</div>
+    <input type="hidden" id="ewIdx">
+    <div class="fg"><label>Tarih</label><input type="date" id="ewDate"></div>
+    <div class="frow">
+      <div class="fg"><label>Kilo (kg) *</label><input type="number" id="ewKilo" step="0.1" inputmode="decimal"></div>
+      <div class="fg"><label>Bel Ölçüsü (cm)</label><input type="number" id="ewWaist" step="0.5" inputmode="decimal"></div>
+    </div>
+    <div class="fg"><label>Not</label><input type="text" id="ewNote" placeholder="ör. Sabah aç karnına"></div>
+    <div class="mactions">
+      <button class="btn-c" onclick="closeModal('editWeightModal')">İptal</button>
+      <button class="btn-s" onclick="saveEditWeight()">Güncelle ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT WORKOUT MODAL -->
+<div class="overlay" id="editWorkoutModal">
+  <div class="modal">
+    <div class="modal-bar"></div>
+    <div class="modal-title">✏️ Antrenman Düzenle</div>
+    <input type="hidden" id="ewoIdx">
+    <div class="fg"><label>Antrenman Adı *</label><input type="text" id="ewoName"></div>
+    <div class="frow">
+      <div class="fg"><label>Set × Tekrar</label><input type="text" id="ewoSets" placeholder="ör. 4×12"></div>
+      <div class="fg"><label>Ağırlık</label><input type="text" id="ewoWeight" placeholder="ör. 12 kg"></div>
+    </div>
+    <div class="fg"><label>Modül</label>
+      <select id="ewoModule">
+        <option value="a">Modül A — Bacak + Core</option>
+        <option value="b">Modül B — Üst İtme</option>
+        <option value="c">Modül C — Çekme + Sırt</option>
+        <option value="d">Modül D — Bacak 2</option>
+        <option value="cardio">Yürüyüş / Cardio</option>
+        <option value="other">Diğer</option>
+      </select>
+    </div>
+    <div class="fg"><label>Not</label><input type="text" id="ewoNote"></div>
+    <div class="mactions">
+      <button class="btn-c" onclick="closeModal('editWorkoutModal')">İptal</button>
+      <button class="btn-s g" onclick="saveEditWorkout()">Güncelle ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT NUTRITION MODAL -->
+<div class="overlay" id="editNutritionModal">
+  <div class="modal">
+    <div class="modal-bar"></div>
+    <div class="modal-title">✏️ Öğün Düzenle</div>
+    <input type="hidden" id="enuIdx">
+    <div class="fg"><label>Öğün</label>
+      <select id="enuMeal">
+        <option value="sabah">☀️ Sabah</option>
+        <option value="ogle">🌞 Öğle</option>
+        <option value="ara">🍎 Ara Öğün</option>
+        <option value="aksam">🌙 Akşam</option>
+        <option value="gece">🌙 Gece</option>
+      </select>
+    </div>
+    <div class="fg"><label>Yiyecek *</label><input type="text" id="enuFood"></div>
+    <div class="frow">
+      <div class="fg"><label>Kalori (kcal)</label><input type="number" id="enuKcal" inputmode="numeric"></div>
+      <div class="fg"><label>Protein (g)</label><input type="number" id="enuProtein" inputmode="numeric"></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label>Karbonhidrat (g)</label><input type="number" id="enuCarb" inputmode="numeric"></div>
+      <div class="fg"><label>Yağ (g)</label><input type="number" id="enuFat" inputmode="numeric"></div>
+    </div>
+    <div class="mactions">
+      <button class="btn-c" onclick="closeModal('editNutritionModal')">İptal</button>
+      <button class="btn-s o" onclick="saveEditNutrition()">Güncelle ✓</button>
+    </div>
+  </div>
+</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
 import { getFirestore, doc, setDoc, onSnapshot, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
@@ -592,6 +711,7 @@ function renderAll(){
   document.getElementById('motiEmoji').textContent=m.e;
   document.getElementById('motiText').innerHTML=m.t;
   renderStats();renderGoals();renderCharts();renderWeightList();renderWorkouts();renderNutrition();renderWater();loadNotif();
+  renderGoalForecast();renderWeeklyReport();renderMonthlyCard();
 }
 
 function renderStats(){
@@ -721,7 +841,10 @@ function renderWeightList(){
         ${w.note?`<div class="er-note">${esc(w.note)}</div>`:''}
       </div>
       <div class="er-bmi">BMI<br>${bmi}</div>
-      <button class="del-x" onclick="delWeight(${origIdx})">×</button>
+      <div class="row-actions">
+        <button class="edit-x" onclick="editWeight(${origIdx})" title="Düzenle">✏️</button>
+        <button class="del-x" onclick="delWeight(${origIdx})">×</button>
+      </div>
     </div>`;
   }).join('');
 }
@@ -739,7 +862,10 @@ function renderWorkouts(){
         <div class="wo-detail">${w.sets||''} ${w.weight?'· '+w.weight:''} ${w.note?'· '+esc(w.note):''}</div>
       </div>
       <span class="wo-tag wt-${w.module||'other'}">${MOD_LABELS[w.module]||'Diğer'}</span>
-      <button class="del-x" onclick="delWo(${ri})">×</button>
+      <div class="row-actions">
+        <button class="edit-x" onclick="editWo(${ri})" title="Düzenle">✏️</button>
+        <button class="del-x" onclick="delWo(${ri})">×</button>
+      </div>
     </div>`;
   }).join('');
   document.getElementById('workoutProg').innerHTML=PROG.map(p=>`
@@ -761,7 +887,10 @@ function renderNutrition(){
         <div class="nu-title">${esc(n.food)}</div>
         <div class="nu-sub">${MEAL_NAMES[n.meal]||n.meal} · ${n.kcal||'—'} kcal · P:${n.protein||0}g K:${n.carb||0}g Y:${n.fat||0}g</div>
       </div>
-      <button class="del-x" onclick="delNu(${ri})">×</button>
+      <div class="row-actions">
+        <button class="edit-x" onclick="editNu(${ri})" title="Düzenle">✏️</button>
+        <button class="del-x" onclick="delNu(${ri})">×</button>
+      </div>
     </div>`;
   }).join('');
 }
@@ -781,6 +910,141 @@ function renderWater(){
     d.onclick=()=>setGlass(i);
     grid.appendChild(d);
   }
+}
+
+// ── GOAL FORECAST ──
+function renderGoalForecast(){
+  const el=document.getElementById('goalForecastCard');
+  const ws=S.weights||[];
+  const sorted=[...ws].sort((a,b)=>new Date(a.date)-new Date(b.date));
+  if(sorted.length<2){el.innerHTML='<div style="color:var(--muted);font-size:13px;text-align:center;padding:8px 0">📊 En az 2 tartı girişi gerekli</div>';return;}
+  const first=sorted[0],last=sorted[sorted.length-1];
+  const weeks=Math.max(1,(new Date(last.date)-new Date(first.date))/(7*86400000));
+  const totalLost=parseFloat(first.weight)-parseFloat(last.weight);
+  const weeklyRate=totalLost/weeks;
+  const remaining=parseFloat(last.weight)-GOAL_W;
+  const curW=parseFloat(last.weight);
+  const bmi=(curW/(HEIGHT*HEIGHT));
+
+  let html='';
+  if(weeklyRate>0){
+    const weeksLeft=remaining/weeklyRate;
+    const targetDate=new Date();targetDate.setDate(targetDate.getDate()+Math.round(weeksLeft*7));
+    const dateStr=targetDate.toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'});
+    const monthsLeft=(weeksLeft/4.33).toFixed(1);
+    html+=`<div class="forecast-row">
+      <div class="forecast-icon">🏁</div>
+      <div class="forecast-body">
+        <div class="forecast-label">Tahmini Hedef Tarihi</div>
+        <div class="forecast-val" style="color:var(--green)">${dateStr}</div>
+        <div class="forecast-sub">~${monthsLeft} ay · ${weeksLeft.toFixed(0)} hafta · Haftalık ${weeklyRate.toFixed(2)} kg</div>
+      </div>
+    </div>
+    <div class="forecast-row">
+      <div class="forecast-icon">⚖️</div>
+      <div class="forecast-body">
+        <div class="forecast-label">Kalan Kilo</div>
+        <div class="forecast-val" style="color:var(--orange)">${remaining.toFixed(1)} kg</div>
+        <div class="forecast-sub">Güncel ${curW} kg → Hedef ${GOAL_W} kg</div>
+      </div>
+    </div>
+    <div class="forecast-row">
+      <div class="forecast-icon">📉</div>
+      <div class="forecast-body">
+        <div class="forecast-label">BMI Durumu</div>
+        <div class="forecast-val" style="color:${bmi>=30?'var(--red)':bmi>=25?'var(--orange)':'var(--green)'}">${bmi.toFixed(1)}</div>
+        <div class="forecast-sub">${bmi>=30?'Obez':bmi>=25?'Fazla Kilolu':bmi>=18.5?'Normal':'Zayıf'} · Hedef BMI ~22.4</div>
+      </div>
+    </div>`;
+  } else {
+    html='<div style="color:var(--muted);font-size:13px;text-align:center;padding:8px 0">⚠️ Kilo artışı var — trendi tersine çevir!</div>';
+  }
+  el.innerHTML=html;
+}
+
+// ── WEEKLY REPORT ──
+function renderWeeklyReport(){
+  const el=document.getElementById('weeklyReportCard');
+  const now=new Date();
+  const weekAgo=new Date(now);weekAgo.setDate(now.getDate()-7);
+  const ws=S.weights||[];
+  const sorted=[...ws].sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const recentWeights=sorted.filter(w=>new Date(w.date)>=weekAgo);
+  const thisWeekW=recentWeights.length?(parseFloat(recentWeights[recentWeights.length-1].weight)-parseFloat(recentWeights[0].weight)):null;
+  const workoutsThisWeek=(S.workouts||[]).filter(w=>{const d=new Date(w.date);return d>=weekAgo&&w.done;}).length;
+  const totalWorkouts=(S.workouts||[]).filter(w=>w.done).length;
+  const waterDays=now.getDate();
+  const avgWater=S.water?.ml?((S.water.ml/1000).toFixed(1)):'—';
+  const nutritionThisWeek=(S.nutrition||[]).filter(n=>new Date(n.date)>=weekAgo).length;
+  const kcalThisWeek=(S.nutrition||[]).filter(n=>new Date(n.date)>=weekAgo).reduce((a,n)=>a+(parseInt(n.kcal)||0),0);
+
+  el.innerHTML=`<div class="report-grid">
+    <div class="report-item">
+      <div class="report-item-label">Bu Hafta Kilo</div>
+      <div class="report-item-val" style="color:${thisWeekW===null?'var(--muted)':thisWeekW<0?'var(--green)':'var(--red)'}">${thisWeekW===null?'—':(thisWeekW>0?'+':'')+thisWeekW.toFixed(1)+' kg'}</div>
+      <div class="report-item-sub">${thisWeekW===null?'Veri yok':thisWeekW<0?'Süper! Devam 🔥':'Dikkat et 💪'}</div>
+    </div>
+    <div class="report-item">
+      <div class="report-item-label">Tamamlanan Antrenman</div>
+      <div class="report-item-val" style="color:var(--blue)">${workoutsThisWeek}</div>
+      <div class="report-item-sub">Toplam ${totalWorkouts} antrenman</div>
+    </div>
+    <div class="report-item">
+      <div class="report-item-label">Bugünkü Su</div>
+      <div class="report-item-val" style="color:var(--cyan)">${avgWater} L</div>
+      <div class="report-item-sub">${S.water?.ml>=3000?'Hedef tamamlandı ✓':'Hedef 3L'}</div>
+    </div>
+    <div class="report-item">
+      <div class="report-item-label">Bu Hafta Kalori</div>
+      <div class="report-item-val" style="color:var(--orange)">${kcalThisWeek}</div>
+      <div class="report-item-sub">${nutritionThisWeek} öğün girildi</div>
+    </div>
+  </div>`;
+}
+
+// ── MONTHLY CARD ──
+function renderMonthlyCard(){
+  const el=document.getElementById('monthlyCard');
+  const now=new Date();
+  const monthStr=now.toISOString().slice(0,7);
+  const ws=S.weights||[];
+  const sorted=[...ws].sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const thisMonth=sorted.filter(w=>w.date&&w.date.startsWith(monthStr));
+  const prevMonthStr=new Date(now.getFullYear(),now.getMonth()-1,1).toISOString().slice(0,7);
+  const prevMonth=sorted.filter(w=>w.date&&w.date.startsWith(prevMonthStr));
+  const monthName=now.toLocaleDateString('tr-TR',{month:'long',year:'numeric'});
+
+  const firstThisMonth=thisMonth[0],lastThisMonth=thisMonth[thisMonth.length-1];
+  const monthLost=firstThisMonth&&lastThisMonth?(parseFloat(firstThisMonth.weight)-parseFloat(lastThisMonth.weight)):null;
+  const prevLost=prevMonth.length>=2?(parseFloat(prevMonth[0].weight)-parseFloat(prevMonth[prevMonth.length-1].weight)):null;
+  const totalLost=sorted.length>=2?(parseFloat(sorted[0].weight)-parseFloat(sorted[sorted.length-1].weight)):null;
+  const totalWorkoutsDone=(S.workouts||[]).filter(w=>w.done&&w.date&&w.date.startsWith(monthStr)).length;
+  const monthKcal=(S.nutrition||[]).filter(n=>n.date&&n.date.startsWith(monthStr)).reduce((a,n)=>a+(parseInt(n.kcal)||0),0);
+
+  el.innerHTML=`
+    <div style="font-size:12px;font-weight:700;color:var(--text2);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">${monthName}</div>
+    <div class="monthly-row">
+      <span class="monthly-row-label">Bu ay verilen kilo</span>
+      <span class="monthly-row-val" style="color:${monthLost===null?'var(--muted)':monthLost>0?'var(--green)':'var(--red)'}">
+        ${monthLost===null?'—':(monthLost>0?'-':'+')+(Math.abs(monthLost)).toFixed(1)+' kg'}
+      </span>
+    </div>
+    <div class="monthly-row">
+      <span class="monthly-row-label">Geçen ay</span>
+      <span class="monthly-row-val" style="color:var(--muted)">${prevLost===null?'—':(prevLost>0?'-':'+')+(Math.abs(prevLost||0)).toFixed(1)+' kg'}</span>
+    </div>
+    <div class="monthly-row">
+      <span class="monthly-row-label">Başlangıçtan toplam</span>
+      <span class="monthly-row-val" style="color:var(--green)">${totalLost===null?'—':totalLost.toFixed(1)+' kg'}</span>
+    </div>
+    <div class="monthly-row">
+      <span class="monthly-row-label">Bu ay antrenman</span>
+      <span class="monthly-row-val" style="color:var(--blue)">${totalWorkoutsDone} seans</span>
+    </div>
+    <div class="monthly-row">
+      <span class="monthly-row-label">Bu ay toplam kalori</span>
+      <span class="monthly-row-val" style="color:var(--orange)">${monthKcal} kcal</span>
+    </div>`;
 }
 
 // ── ACTIONS ──
@@ -806,6 +1070,65 @@ window.addWorkout=async function(){
 };
 window.toggleWo=async function(i){S.workouts[i].done=!S.workouts[i].done;if(S.workouts[i].done)confetti(window.innerWidth/2,300);await save();renderWorkouts();};
 window.delWo=async function(i){if(!confirm('Sil?'))return;S.workouts.splice(i,1);await save();renderWorkouts();};
+
+window.editWeight=function(i){
+  const w=S.weights[i];
+  document.getElementById('ewIdx').value=i;
+  document.getElementById('ewDate').value=w.date;
+  document.getElementById('ewKilo').value=w.weight;
+  document.getElementById('ewWaist').value=w.waist||'';
+  document.getElementById('ewNote').value=w.note||'';
+  openModal('editWeightModal');
+};
+window.saveEditWeight=async function(){
+  const i=parseInt(document.getElementById('ewIdx').value);
+  const kilo=document.getElementById('ewKilo').value;
+  if(!kilo){alert('Kilo zorunludur!');return;}
+  S.weights[i]={
+    date:document.getElementById('ewDate').value,
+    weight:parseFloat(kilo),
+    waist:document.getElementById('ewWaist').value?parseFloat(document.getElementById('ewWaist').value):null,
+    note:document.getElementById('ewNote').value.trim()
+  };
+  await save();renderAll();closeModal('editWeightModal');
+};
+
+window.editWo=function(i){
+  const w=S.workouts[i];
+  document.getElementById('ewoIdx').value=i;
+  document.getElementById('ewoName').value=w.name||'';
+  document.getElementById('ewoSets').value=w.sets||'';
+  document.getElementById('ewoWeight').value=w.weight||'';
+  document.getElementById('ewoModule').value=w.module||'other';
+  document.getElementById('ewoNote').value=w.note||'';
+  openModal('editWorkoutModal');
+};
+window.saveEditWorkout=async function(){
+  const i=parseInt(document.getElementById('ewoIdx').value);
+  const name=document.getElementById('ewoName').value.trim();
+  if(!name){alert('Antrenman adı zorunlu!');return;}
+  S.workouts[i]={...S.workouts[i],name,sets:document.getElementById('ewoSets').value,weight:document.getElementById('ewoWeight').value,module:document.getElementById('ewoModule').value,note:document.getElementById('ewoNote').value.trim()};
+  await save();renderWorkouts();closeModal('editWorkoutModal');
+};
+
+window.editNu=function(i){
+  const n=S.nutrition[i];
+  document.getElementById('enuIdx').value=i;
+  document.getElementById('enuMeal').value=n.meal||'sabah';
+  document.getElementById('enuFood').value=n.food||'';
+  document.getElementById('enuKcal').value=n.kcal||'';
+  document.getElementById('enuProtein').value=n.protein||'';
+  document.getElementById('enuCarb').value=n.carb||'';
+  document.getElementById('enuFat').value=n.fat||'';
+  openModal('editNutritionModal');
+};
+window.saveEditNutrition=async function(){
+  const i=parseInt(document.getElementById('enuIdx').value);
+  const food=document.getElementById('enuFood').value.trim();
+  if(!food){alert('Yiyecek adı zorunlu!');return;}
+  S.nutrition[i]={...S.nutrition[i],meal:document.getElementById('enuMeal').value,food,kcal:document.getElementById('enuKcal').value,protein:document.getElementById('enuProtein').value,carb:document.getElementById('enuCarb').value,fat:document.getElementById('enuFat').value};
+  await save();renderNutrition();renderCharts();closeModal('editNutritionModal');
+};
 
 window.addNutrition=async function(){
   const food=document.getElementById('nFood').value.trim();if(!food){alert('Yiyecek adı zorunlu!');return;}
